@@ -4,20 +4,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Zelda</title>
 
-<script>
-  EJS_DEBUG_XX = true;
-  EJS_threads = false;
-  EJS_player = "#game";
-  EJS_core = "snes";
-  EJS_gameUrl = "roms/zelda.sfc";
-  EJS_pathtodata = "EmulatorJS-main/data/";
+  <div id="game" style="width:100vw; height:100vh;"></div>
 
-  // 🔴 deixa o emulador iniciar sozinho
-  EJS_startOnLoaded = true;
-  EJS_fullscreenOnLoaded = false;
-</script>
+  <script>
+    EJS_player = "#game";
+    EJS_core = "snes";                          // Super Nintendo
+    EJS_gameUrl = "roms/zelda.sfc";        // ajuste o nome da sua ROM
+    EJS_pathtodata = "https://cdn.emulatorjs.org/latest/data/";
+    EJS_startOnLoaded = true;
+    EJS_fullscreenOnLoaded = false;
+  </script>
 
-<script src="EmulatorJS-main/data/loader.js"></script>
+  <script src="https://cdn.emulatorjs.org/latest/data/loader.js"></script>
 
 <style>
 html, body {
