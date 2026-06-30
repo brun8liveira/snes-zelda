@@ -1,61 +1,119 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Zelda</title>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Zelda</title>
 
-  <div id="game" style="width:100vw; height:100vh;"></div>
+  <style>
+    html, body {
+      margin: 0;
+      background: black;
+      height: 100%;
+      overflow: hidden;
+      touch-action: none;
+    }
 
-  <script>
+    #game {
+      width: 100vw;
+      height: 100vh;
+    }
+
+    /* Botão de fullscreen – canto superior ESQUERDO */
+    #fullscreen-btn {
+      position: fixed;
+      top: 8px;
+      left: 8px;              /* aqui troca de right pra left */
+      z-index: 20;
+      background: rgba(0,0,0,0.6);
+      color: #fff;
+      border-radius: 6px;
+      padding: 6px 10px;
+      font-size: 14px;
+      cursor: pointer;
+      user-select: none;
+      display: none;          /* começa escondido */
+    }
+
+    /* Overlay de toque (se você quiser manter) */
+    #overlay {
+      position: fixed;
+      inset: 0;
+      background: black;
+      color: white;
+      font-size: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      cursor: pointer;
+    }
+  </style>
+
+	<script>
+    // SNES no seu servidor
     EJS_player = "#game";
-    EJS_core = "snes";                          // Super Nintendo
-    EJS_gameUrl = "roms/zelda.sfc";        // ajuste o nome da sua ROM
-    EJS_pathtodata = "https://cdn.emulatorjs.org/latest/data/";
-    EJS_startOnLoaded = true;
+    EJS_core = "snes";
+    EJS_gameUrl = "roms/zelda.sfc"; // troque pelo nome certo
+    EJS_pathtodata = "data/";
+    EJS_startOnLoaded = true; // deixa o EmulatorJS mostrar o botão dele
     EJS_fullscreenOnLoaded = false;
-  </script>
-
-  <script src="https://cdn.emulatorjs.org/latest/data/loader.js"></script>
-
-<style>
-html, body {
-  margin: 0;
-  background: black;
-  height: 100%;
-  overflow: hidden;
-}
-#game {
-  width: 100vw;
-  height: 100vh;
-}
-#overlay {
-  position: fixed;
-  inset: 0;
-  background: black;
-  color: white;
-  font-size: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 10;
-}
-</style>
+    </script>
+  <script src="data/loader.js"></script>
 </head>
-
 <body>
 
-<div id="overlay">▶ TOCAR PARA JOGAR</div>
-<div id="game"></div>
+  <div id="overlay">▶ TOCAR PARA JOGAR</div>
+  <div id="fullscreen-btn">⛶ Tela cheia</div>
+  <div id="game"></div>
 
-<script>
-document.getElementById("overlay").addEventListener("click", () => {
-  // gesto do usuário (obrigatório no Android)
-  document.getElementById("overlay").remove();
+  <script>
+    const overlay = document.getElementById("overlay");
+    const fsBtn   = document.getElementById("fullscreen-btn");
 
-  // fullscreen só após toque
-  document.documentElement.requestFullscreen?.();
-});
-</script>
+    // Entrar em fullscreen
+    async function enterFullscreen() {
+      const el = document.documentElement;
+      if (el.requestFullscreen) {
+        try {
+          await el.requestFullscreen();
+        } catch (e) {
+          console.log("Erro ao tentar fullscreen:", e);
+        }
+      }
+    }
+
+    // Detectar mudanças de fullscreen para mostrar/ocultar o botão
+    function updateFullscreenButton() {
+      // Se NÃO está em fullscreen, mostra o botão
+      const isFullscreen = document.fullscreenElement != null;
+      fsBtn.style.display = isFullscreen ? "none" : "block";
+    }
+
+    document.addEventListener("fullscreenchange", updateFullscreenButton);
+
+    // Clique no overlay inicial: remove overlay + entra em fullscreen
+    overlay.addEventListener("click", async () => {
+      overlay.remove();
+      await enterFullscreen();
+      // fullscreenchange será disparado e vai esconder o botão
+    });
+
+    // Clique no botão de fullscreen (quando não estiver em fullscreen)
+    fsBtn.addEventListener("click", async () => {
+      await enterFullscreen();
+      // fullscreenchange vai esconder o botão de novo
+    });
+
+    // Fallback: bloquear scroll por gesto
+    window.addEventListener("touchmove", e => e.preventDefault(), { passive: false });
+
+    // Garantir estado inicial do botão (fora de fullscreen -> aparece)
+    updateFullscreenButton();
+  </script>
 
 </body>
 </html>
